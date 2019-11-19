@@ -1,6 +1,39 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessageBox, QDesktopWidget, QMainWindow, QAction, qApp
 from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtCore import QCoreApplication
+
+
+class MMainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+        #状态栏
+        # self.statusBar().showMessage('ready')
+
+        #按钮（普通控件）
+        btn = QPushButton('我很帅', self)
+        btn.setToolTip('This is a <b>QPushButton</b> widget')
+        btn.resize(btn.sizeHint())
+        btn.move(50, 50)
+
+        #菜单栏
+        exitAct = QAction(QIcon('images/yezi.png'), '&Exit', self)
+        exitAct.setShortcut('shift+Q')
+        exitAct.setStatusTip('exit application')
+        exitAct.triggered.connect(qApp.quit)
+
+        menubar = self.menuBar()
+        fileMenu = menubar.addMenu('&File')
+        fileMenu.addAction(exitAct)
+        menubar.setNativeMenuBar(False)
+
+        self.setGeometry(300, 300, 250, 150)
+        self.setWindowTitle('StatusBar')
+        self.show()
+
 
 class MWidget(QWidget):
     def __init__(self):
@@ -12,7 +45,36 @@ class MWidget(QWidget):
         self.setWindowTitle('Icon')
         self.setWindowIcon(QIcon('images/yezi.png'))
 
+        QToolTip.setFont(QFont('SansSerif', 10))
+        self.setToolTip('This is a <b>QWidget</b> widget')
+
+        btn = QPushButton('我很帅', self)
+        btn.setToolTip('This is a <b>QPushButton</b> widget')
+
+        btn.resize(btn.sizeHint())
+        btn.move(50, 50)
+
+        #退出按钮
+        quit_btn = QPushButton('quit', self)
+        quit_btn.clicked.connect(QCoreApplication.instance().quit)
+        quit_btn.resize(quit_btn.sizeHint())
+        quit_btn.move(100, 100)
+
+        #移到屏幕中间
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+
         self.show()
+
+    def closeEvent(self, event):
+        reply = QMessageBox.question(self, 'Message', 'Are you sure to quit?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
+
 
 def main():
     app = QApplication(sys.argv)
@@ -31,8 +93,13 @@ def qicon():
     mwidget = MWidget()
     sys.exit(app.exec_())
 
+def qmainwindow():
+    app = QApplication(sys.argv)
+    mainwindow = MMainWindow()
+    sys.exit(app.exec_())
+
 if __name__ == "__main__":
-    qicon()
+    qmainwindow()
 
 
 
