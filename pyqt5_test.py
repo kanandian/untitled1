@@ -1,9 +1,39 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessageBox, QDesktopWidget, QMainWindow, QAction, qApp
+from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessageBox, QDesktopWidget, QMainWindow, QAction, qApp, QLCDNumber, QSlider, QVBoxLayout
 from PyQt5.QtGui import QIcon, QFont
-from PyQt5.QtCore import QCoreApplication
+from PyQt5.QtCore import QCoreApplication, Qt
 
 
+#事件(signals and slots)
+class EventWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+        lcd = QLCDNumber(self)
+        sld = QSlider(Qt.Horizontal, self)
+
+        vbox = QVBoxLayout()
+        vbox.addWidget(lcd)
+        vbox.addWidget(sld)
+
+        self.setLayout(vbox)
+        sld.valueChanged.connect(lcd.display)
+
+
+        self.setGeometry(300, 300, 250, 150)
+        self.setWindowTitle('Signals and Slots')
+        self.show()
+
+    #重写keyPressEvent函数以
+    def keyPressEvent(self, e):
+        if e.key() == Qt.Key_Escape:
+            self.close()
+
+
+
+# 菜单栏和工具栏
 class MMainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -68,6 +98,7 @@ class MWidget(QWidget):
 
         self.show()
 
+    #重写关闭应用事件
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Message', 'Are you sure to quit?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
@@ -98,8 +129,13 @@ def qmainwindow():
     mainwindow = MMainWindow()
     sys.exit(app.exec_())
 
+def qeventhandle():
+    app = QApplication(sys.argv)
+    event_widget = EventWidget()
+    sys.exit(app.exec_())
+
 if __name__ == "__main__":
-    qmainwindow()
+    qeventhandle()
 
 
 
